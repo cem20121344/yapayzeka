@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale5.0">
+    <title>Ana Sayfa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 35px;
+            color: #38bdf8;
+            letter-spacing: 1px;
+        }
+
+        /* Havalı Buton Tasarımı */
+        .btn-portal {
+            display: inline-block;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            color: #0f172a;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-portal:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 35px rgba(56, 189, 248, 0.7);
+            background: linear-gradient(135deg, #7dd3fc, #0ea5e9);
+        }
+
+        .btn-portal:active {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Kendi Siteme Git</h1>
+        
+        <!-- Kendi yaptığın sitenin dosya adını buraya yazacaksın -->
+        <a href="webgizli.html" class="btn-portal">Siteyi Aç</a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CemGPT</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #050505;
+            color: #00ff66;
+            font-family: Arial, sans-serif;
+        }
+
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* SOL MENÜ */
+
+        .sidebar {
+            width: 250px;
+            background: #080808;
+            border-right: 1px solid #00ff66;
+            padding: 20px;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px #00ff66;
+        }
+
+        .new-chat {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: #00ff66;
+            border: 1px solid #00ff66;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .new-chat:hover {
+            background: #00ff66;
+            color: black;
+        }
+
+        .history-title {
+            font-size: 13px;
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
+
+        #history {
+            font-size: 14px;
+        }
+
+        /* ANA ALAN */
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .topbar {
+            height: 60px;
+            border-bottom: 1px solid #123;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-weight: bold;
+        }
+
+        .chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        /* HOŞ GELDİN */
+
+        .welcome {
+            max-width: 800px;
+            margin: 80px auto;
+            text-align: center;
+        }
+
+        .welcome-icon {
+            width: 70px;
+            height: 70px;
+            margin: auto;
+            border: 2px solid #00ff66;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 0 25px #00ff66;
+        }
+
+        .welcome h1 {
+            font-size: 42px;
+            margin: 20px 0 10px;
+        }
+
+        .welcome p {
+            color: #aaa;
+        }
+
+        .suggestions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .suggestion {
+            border: 1px solid #164;
+            background: #091009;
+            padding: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .suggestion:hover {
+            border-color: #00ff66;
+            box-shadow: 0 0 15px #00ff6633;
+        }
+
+        /* MESAJLAR */
+
+        .message {
+            max-width: 850px;
+            margin: 15px auto;
+            padding: 15px;
+            border-radius: 10px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .user {
+            background: #102015;
+            border: 1px solid #164;
+        }
+
+        .bot {
+            background: #090909;
+            border: 1px solid #073;
+        }
+
+        /* ALT KISIM */
+
+        .input-area {
+            padding: 15px;
+            border-top: 1px solid #123;
+            display: flex;
+            gap: 10px;
+        }
+
+        #messageInput {
+            flex: 1;
+            background: #080808;
+            color: white;
+            border: 1px solid #164;
+            border-radius: 10px;
+            padding: 15px;
+            outline: none;
+        }
+
+        #messageInput:focus {
+            border-color: #00ff66;
+            box-shadow: 0 0 10px #00ff6633;
+        }
+
+        #sendButton {
+            width: 100px;
+            border: none;
+            border-radius: 10px;
+            background: #00ff66;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #sendButton:hover {
+            box-shadow: 0 0 20px #00ff66;
+        }
+
+        /* TELEFON */
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                display: none;
+            }
+
+            .chat {
+                padding: 15px;
+            }
+
+            .welcome {
+                margin: 50px auto;
+            }
+
+            .welcome h1 {
+                font-size: 32px;
+            }
+
+            .suggestions {
+                grid-template-columns: 1fr;
+            }
+
+            .input-area {
+                padding: 10px;
+            }
+
+            #sendButton {
+                width: 70px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            CEMGPT
+        </div>
+
+        <button class="new-chat" onclick="newChat()">
+            + Yeni Sohbet
+        </button>
+
+        <div class="history-title">
+            SOHBET GEÇMİŞİ
+        </div>
+
+        <div id="history"></div>
+
+    </aside>
+
+
+    <main class="main">
+
+        <div class="topbar">
+            CEMGPT // AI SYSTEM
+        </div>
+
+
+        <div class="chat" id="chat">
+
+            <div class="welcome" id="welcome">
+
+                <div class="welcome-icon">
+                    AI
+                </div>
+
+                <h1>CemGPT</h1>
+
+                <p>
+                    Merhaba! Ben CemGPT. Bir şey sor.
+                </p>
+
+
+                <div class="suggestions">
+
+                    <div
+                        class="suggestion"
+                        onclick="askSuggestion('4 x 4 kaç eder?')"
+                    >
+                        4 x 4 kaç eder?
+                    </div>
+
+
+                    <div
+                        class="suggestion"
+                        onclick="askSuggestion('Türkiye kaç ilden oluşur?')"
+                    >
+                        Türkiye kaç ilden oluşur?
+                    </div>
+
+
+                    <div
+                        class="suggestion"
+                        onclick="askSuggestion('Dünyada kaç kıta vardır?')"
+                    >
+                        Dünyada kaç kıta vardır?
+                    </div>
+
+
+                    <div
+                        class="suggestion"
+                        onclick="askSuggestion('Gezegenleri söyle')"
+                    >
+                        Gezegenleri söyle
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="input-area">
+
+            <input
+                type="text"
+                id="messageInput"
+                placeholder="CemGPT'ye bir şey sor..."
+                onkeydown="handleKey(event)"
+            >
+
+            <button
+                id="sendButton"
+                onclick="sendMessage()"
+            >
+                GÖNDER
+            </button>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    let messages = [];
+
+    let welcome = document.getElementById("welcome");
+
+    const chat = document.getElementById("chat");
+
+    const input = document.getElementById("messageInput");
+
+    const history = document.getElementById("history");
+
+
+    /* =========================================
+       MATEMATİK
+    ========================================= */
+
+    function mathEngine(text) {
+
+        let s = text
+            .toLowerCase()
+            .replace(/×/g, "*")
+            .replace(/÷/g, "/")
+            .replace(/x/g, "*")
+            .replace(/:/g, "/");
+
+        const match = s.match(
+            /[0-9][0-9+\-*/%.()\s]*[0-9]/
+        );
+
+        if (!match) {
+            return null;
+        }
+
+        let expression = match[0];
+
+        if (
+            !/^[0-9+\-*/%.()\s]+$/.test(expression)
+        ) {
+            return null;
+        }
+
+        try {
+
+            const result = Function(
+                '"use strict"; return (' +
+                expression +
+                ')'
+            )();
+
+            if (
+                typeof result === "number" &&
+                Number.isFinite(result)
+            ) {
+                return result;
+            }
+
+        } catch (error) {
+            return null;
+        }
+
+        return null;
+    }
+
+
+    /* =========================================
+       CEVAP ÜRET
+    ========================================= */
+
+    function generateAnswer(text) {
+
+        const lower = text.toLowerCase().trim();
+
+
+        if (
+            lower.includes("merhaba") ||
+            lower.includes("selam") ||
+            lower === "hey"
+        ) {
+            return "Merhaba! Ben CemGPT. Sana nasıl yardımcı olabilirim?";
+        }
+
+
+        if (
+            lower.includes("nasılsın") ||
+            lower.includes("nasilsin")
+        ) {
+            return "İyiyim kanka 😎 Senin için çalışmaya hazırım.";
+        }
+
+
+        if (
+            lower.includes("adın ne") ||
+            lower.includes("adin ne") ||
+            lower.includes("ismin ne")
+        ) {
+            return "Benim adım CemGPT.";
+        }
+
+
+        /* MATEMATİK */
+
+        const mathResult = mathEngine(text);
+
+        if (mathResult !== null) {
+            return "SONUÇ: " + mathResult;
+        }
+
+
+        /* TÜRKİYE */
+
+        if (
+            lower.includes("türkiye kaç il") ||
+            lower.includes("turkiye kac il")
+        ) {
+            return "Türkiye 81 ilden oluşur.";
+        }
+
+
+        if (
+            lower.includes("türkiye'nin başkenti") ||
+            lower.includes("turkiyenin baskenti")
+        ) {
+            return "Türkiye'nin başkenti Ankara'dır.";
+        }
+
+
+        /* KITA */
+
+        if (
+            lower.includes("kaç kıta") ||
+            lower.includes("kac kita")
+        ) {
+            return "Dünya üzerinde yaygın olarak 7 kıta kabul edilir.";
+        }
+
+
+        /* GEZEGENLER */
+
+        if (
+            lower.includes("gezegenleri söyle") ||
+            lower.includes("gezegenler")
+        ) {
+            return "Merkür, Venüs, Dünya, Mars, Jüpiter, Satürn, Uranüs ve Neptün.";
+        }
+
+
+        /* DÜNYA */
+
+        if (
+            lower.includes("dünya'nın şekli") ||
+            lower.includes("dunyanin sekli")
+        ) {
+            return "Dünya yaklaşık küresel bir şekle sahiptir.";
+        }
+
+
+        /* HTML */
+
+        if (lower.includes("html nedir")) {
+            return "HTML, web sayfalarının yapısını oluşturmak için kullanılan işaretleme dilidir.";
+        }
+
+
+        /* CSS */
+
+        if (lower.includes("css nedir")) {
+            return "CSS, web sayfalarının görünümünü ve tasarımını düzenlemek için kullanılır.";
+        }
+
+
+        /* JAVASCRIPT */
+
+        if (
+            lower.includes("javascript nedir") ||
+            lower.includes("js nedir")
+        ) {
+            return "JavaScript, web sayfalarına etkileşim ve davranış kazandıran bir programlama dilidir.";
+        }
+
+
+        /* PYTHON */
+
+        if (lower.includes("python nedir")) {
+            return "Python, öğrenmesi kolay ve çok farklı alanlarda kullanılan bir programlama dilidir.";
+        }
+
+
+        /* YAPAY ZEKA */
+
+        if (
+            lower.includes("yapay zeka nedir") ||
+            lower.includes("ai nedir")
+        ) {
+            return "Yapay zeka, bilgisayarların belirli görevlerde insan benzeri öğrenme ve problem çözme yetenekleri göstermesini sağlayan teknolojilerin genel adıdır.";
+        }
+
+
+        /* TEŞEKKÜR */
+
+        if (
+            lower.includes("teşekkür") ||
+            lower.includes("tesekkur")
+        ) {
+            return "Rica ederim kanka 😎";
+        }
+
+
+        /* GÜLE GÜLE */
+
+        if (
+            lower.includes("görüşürüz") ||
+            lower.includes("gorusuruz")
+        ) {
+            return "Görüşürüz kanka!";
+        }
+
+
+        return "Bunu henüz öğrenmedim. Ama CemGPT'yi geliştirmeye devam ediyoruz.";
+    }
+
+
+    /* =========================================
+       MESAJ EKLE
+    ========================================= */
+
+    function addMessage(text, type) {
+
+        const message = document.createElement("div");
+
+        message.className =
+            "message " + type;
+
+        message.textContent = text;
+
+        chat.appendChild(message);
+
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+
+    /* =========================================
+       MESAJ GÖNDER
+    ========================================= */
+
+    async function sendMessage() {
+
+    const text = input.value.trim();
+
+    if (text === "") {
+        return;
+    }
+
+    if (welcome) {
+        welcome.style.display = "none";
+    }
+
+    addMessage(text, "user");
+
+    messages.push({
+        user: text
+    });
+
+    input.value = "";
+
+    const loading = document.createElement("div");
+
+    loading.className = "message bot";
+    loading.textContent = "CemGPT düşünüyor...";
+
+    chat.appendChild(loading);
+
+    chat.scrollTop = chat.scrollHeight;
+
+    try {
+
+        const response = await fetch(
+            "http://192.168.25.71:3000/chat",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    message: text
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        loading.remove();
+
+        if (data.answer) {
+
+            addMessage(
+                data.answer,
+                "bot"
+            );
+
+            messages.push({
+                bot: data.answer
+            });
+
+            saveMessages();
+            updateHistory();
+
+        } else {
+
+            addMessage(
+                "CemGPT cevap veremedi.",
+                "bot"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        loading.remove();
+
+        addMessage(
+            "CemGPT sunucusuna bağlanamadım. server.js çalışıyor mu?",
+            "bot"
+        );
+    }
+}
+
+
+    /* =========================================
+       ENTER TUŞU
+    ========================================= */
+
+    function handleKey(event) {
+
+        if (event.key === "Enter") {
+            sendMessage();
+        }
+
+    }
+
+
+    /* =========================================
+       ÖNERİ
+    ========================================= */
+
+    function askSuggestion(text) {
+
+        input.value = text;
+
+        sendMessage();
+
+    }
+
+
+    /* =========================================
+       GEÇMİŞİ KAYDET
+    ========================================= */
+
+    function saveMessages() {
+
+        localStorage.setItem(
+            "cemgpt_messages",
+            JSON.stringify(messages)
+        );
+
+    }
+
+
+    /* =========================================
+       GEÇMİŞİ GÜNCELLE
+    ========================================= */
+
+    function updateHistory() {
+
+        history.innerHTML = "";
+
+        messages.forEach(function (item) {
+
+            const div =
+                document.createElement("div");
+
+            div.textContent =
+                item.user || item.bot || "";
+
+            div.style.padding = "8px 0";
+            div.style.color = "#888";
+
+            history.appendChild(div);
+
+        });
+
+    }
+
+
+    /* =========================================
+       YENİ SOHBET
+    ========================================= */
+
+    function newChat() {
+
+        messages = [];
+
+        localStorage.removeItem(
+            "cemgpt_messages"
+        );
+
+        chat.innerHTML = "";
+
+
+        const newWelcome =
+            document.createElement("div");
+
+        newWelcome.id = "welcome";
+
+        newWelcome.className =
+            "welcome";
+
+
+        newWelcome.innerHTML = `
+
+            <div class="welcome-icon">
+                AI
+            </div>
+
+            <h1>CemGPT</h1>
+
+            <p>
+                Merhaba! Ben CemGPT. Bir şey sor.
+            </p>
+
+            <div class="suggestions">
+
+                <div
+                    class="suggestion"
+                    onclick="askSuggestion('4 x 4 kaç eder?')"
+                >
+                    4 x 4 kaç eder?
+                </div>
+
+                <div
+                    class="suggestion"
+                    onclick="askSuggestion('Türkiye kaç ilden oluşur?')"
+                >
+                    Türkiye kaç ilden oluşur?
+                </div>
+
+                <div
+                    class="suggestion"
+                    onclick="askSuggestion('Dünyada kaç kıta vardır?')"
+                >
+                    Dünyada kaç kıta vardır?
+                </div>
+
+                <div
+                    class="suggestion"
+                    onclick="askSuggestion('Gezegenleri söyle')"
+                >
+                    Gezegenleri söyle
+                </div>
+
+            </div>
+        `;
+
+
+        chat.appendChild(newWelcome);
+
+        welcome = newWelcome;
+
+        updateHistory();
+
+    }
+
+
+    /* =========================================
+       BAŞLANGIÇ
+    ========================================= */
+
+    const saved =
+        localStorage.getItem("cemgpt_messages");
+
+
+    if (saved) {
+
+        try {
+
+            messages =
+                JSON.parse(saved);
+
+            updateHistory();
+
+        } catch (error) {
+
+            messages = [];
+
+        }
+
+    }
+
+</script>
+
+</body>
+</html>

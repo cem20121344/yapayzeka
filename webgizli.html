@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş ve Kayıt Ekranı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b0f19; /* Şık koyu gece mavisi fon */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 380px;
+            background: #1e293b; /* Kart arka planı */
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155; /* Uyumlu ince çerçeve */
+        }
+
+        .form-box {
+            display: none;
+            flex-direction: column;
+        }
+
+        .form-box.active {
+            display: flex;
+        }
+
+        h2 {
+            text-align: center;
+            color: #38bdf8; /* Neon mavi başlık rengi */
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .input-box {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 14px 20px;
+            background: #0f172a; /* Input içi koyu ton */
+            border: 2px solid #334155;
+            outline: none;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .input-box input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #38bdf8, #0284c7); /* Neon mavi buton geçişi */
+            border: none;
+            border-radius: 8px;
+            color: #0f172a;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #7dd3fc, #0ea5e9);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .switch-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .switch-text span {
+            color: #38bdf8;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- GİRİŞ EKRANI -->
+        <div id="login-form" class="form-box active">
+            <h2>Giriş Yap</h2>
+            <form onsubmit="girisYap(event)">
+                <div class="input-box">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="loginPassword" placeholder="Şifre" required>
+                </div>
+                <button type="submit" class="btn">Giriş Yap</button>
+            </form>
+            <div class="switch-text">
+                Hesabın yok mu? <span onclick="toggleForm()">Kayıt Ol</span>
+            </div>
+        </div>
+
+        <!-- KAYIT OL EKRANI -->
+        <div id="signup-form" class="form-box">
+            <h2>Kayıt Ol</h2>
+            <form onsubmit="kayitOl(event)">
+                <div class="input-box">
+                    <input type="text" id="signupAd" placeholder="Adın" required>
+                </div>
+                <div class="input-box">
+                    <input type="email" id="signupEmail" placeholder="Email" required>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="signupPassword" placeholder="Şifre" required>
+                </div>
+                <button type="submit" class="btn">Hesap Oluştur</button>
+            </form>
+            <div class="switch-text">
+                Zaten hesabın var mı? <span onclick="toggleForm()">Giriş Yap</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ekranlar arası geçiş yapma
+        function toggleForm() {
+            document.getElementById('login-form').classList.toggle('active');
+            document.getElementById('signup-form').classList.toggle('active');
+        }
+
+        // KAYIT OLMA (Bilgileri tarayıcı hafızasına yazar)
+        function kayitOl(event) {
+            event.preventDefault();
+
+            const ad = document.getElementById('signupAd').value;
+            const email = document.getElementById('signupEmail').value;
+            const sifre = document.getElementById('signupPassword').value;
+
+            localStorage.setItem('kayitliEmail', email);
+            localStorage.setItem('kayitliSifre', sifre);
+            localStorage.setItem('kayitliAd', ad);
+
+            alert("Kayıt başarılı! Şimdi giriş yapabilirsiniz.");
+            toggleForm(); // Giriş ekranına döndürür
+        }
+
+        // GİRİŞ YAPMA (Doğruysa asıl web sitene atar)
+        function girisYap(event) {
+            event.preventDefault();
+
+            const girilenEmail = document.getElementById('loginEmail').value;
+            const girilenSifre = document.getElementById('loginPassword').value;
+
+            const kayitliEmail = localStorage.getItem('kayitliEmail');
+            const kayitliSifre = localStorage.getItem('kayitliSifre');
+
+            if (girilenEmail === kayitliEmail && girilenSifre === kayitliSifre) {
+                alert("Giriş başarılı! Web sitenize yönlendiriliyorsunuz...");
+                // Kendi oluşturduğun asıl web sitesi dosyasına yönlendirir:
+                window.location.href = "asılwebsitesi.html";
+            } else {
+                alert("Hatalı email veya şifre! Lütfen önce kayıt olun.");
+            }
+        }
+    </script>
+
+</body>
+</html>
